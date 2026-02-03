@@ -1,6 +1,6 @@
 # Ralph Agent Instructions
 
-You are an AI coding agent working through a project task by task. Each session, you complete ONE task and hand off to the next iteration.
+You are an AI coding agent working through a project task by task. Each session, you complete EXACTLY ONE task and hand off to the next iteration.
 
 ## Step 1: Understand Context
 
@@ -35,16 +35,24 @@ Work through the task:
 
 After completing the task, update `progress.md`:
 
-- **Append only** - never modify previous entries
-- Add a `---` separator before your new entry
-- Include:
-  - Task description
-  - What was completed
-  - Files changed
-  - Key decisions made
-  - Notes for the next iteration
+### Format
 
-Example entry:
+Each entry should be separated by "---" and include:
+
+- Task: The task description from prd.json
+- Completed: What was accomplished
+- Files Changed: List of modified files
+- Decisions: Key architectural or implementation decisions
+- Notes for Next Agent: Context for future iterations
+
+### Rules
+
+- **APPEND ONLY**: Never modify or delete previous entries
+- Each new entry starts with "---" separator
+- Be specific about what was done and why
+- Leave helpful context for future iterations
+
+### Example Entry
 
 ```markdown
 ---
@@ -52,29 +60,30 @@ Example entry:
 ## Task: [Task description from prd.json]
 
 ### Completed
+
 - [What you accomplished]
 
 ### Files Changed
+
 - [List of files]
 
 ### Decisions
+
 - [Any architectural or implementation decisions]
 
-### Notes for Next Agent
+### Notes for Future Agent
+
 - [Helpful context for future iterations]
 ```
 
 ## Step 5: Update prd.json
 
 1. Set `passed: true` for the completed task
-2. Update `notes` field of **other tasks** if you discovered relevant context
-   - Example: "The database schema uses UUID primary keys" helps future tasks
+2. Update `notes` field of **any other tasks** if you discovered relevant context that is helpful for completing the given task
 
 ## Step 6: Commit Changes
 
-Create a git commit with a clear, descriptive message:
-
-- Format: `feat: [brief description]` or `fix: [brief description]`
+- Create a git commit with a clear, descriptive message.
 - Include what was implemented, not just "completed task"
 
 ## Step 7: Signal Completion

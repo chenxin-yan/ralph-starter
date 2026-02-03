@@ -157,105 +157,13 @@ The task list that drives the agent's work. Tasks should be small and granular -
 
 The project specification document. This describes what you're building at a high level. The agent reads this to understand the overall goal and make informed decisions.
 
-```markdown
-# Project Name
-
-## Overview
-
-What is this project? What problem does it solve?
-
-## Features
-
-- Feature 1: Description
-- Feature 2: Description
-
-## Technical Stack
-
-- Language/Framework
-- Database
-- Other technologies
-
-## Architecture
-
-High-level architecture decisions.
-
-## Constraints
-
-Any limitations or requirements to be aware of.
-```
-
 ### PROMPT.md
 
 The system prompt template sent to the agent each iteration. This contains the instructions that enforce the Ralph workflow.
 
-```markdown
-You are an AI coding agent working on a project. Follow these instructions exactly:
-
-## Context Files
-
-- Read `SPEC.md` to understand the project specification
-- Read `prd.json` to see all tasks
-- Read `progress.md` to understand what has been done
-
-## Your Task
-
-1. Analyze `prd.json` and select ONE task to work on
-   - Choose the highest priority task that doesn't depend on incomplete tasks
-   - Use your judgment based on task descriptions and current project state
-
-2. Complete the selected task
-   - Follow the subtasks as a guide
-   - Verify your implementation (run tests, type checks, linting if available)
-
-3. Update project files
-   - Append to `progress.md` with: task completed, files changed, decisions made, notes for next agent
-   - Update `notes` field in `prd.json` for related tasks if you discovered useful context
-   - Mark the task as `passed: true` in `prd.json`
-
-4. Commit your changes
-   - Create a git commit with a descriptive message
-
-5. Signal completion
-   - Output: RALPH_TASK_COMPLETE
-
-## Rules
-
-- Work on only ONE task per session
-- Always verify your work before marking complete
-- Leave helpful context for the next agent iteration
-```
-
 ### progress.md
 
 The progress file is **append-only** - the agent adds new entries after each task but never modifies previous entries. This creates an immutable log that serves as a handoff document between agent sessions. Each entry is separated by `---`.
-
-```markdown
----
-
-## Task: Initialize project with TypeScript
-
-### Completed
-
-- Initialized npm project with TypeScript
-- Configured strict tsconfig.json
-- Created src/index.ts entry point
-
-### Files Changed
-
-- package.json
-- tsconfig.json
-- src/index.ts
-
-### Decisions
-
-- Using ES2022 target for modern Node.js support
-- Enabled strict null checks
-
-### Notes for Next Agent
-
-- Ready to implement core features
-- Consider adding ESLint in next task
-```
 
 ## Configuration
 
