@@ -12,11 +12,11 @@ Ralph is a shell-based approach to running AI coding agents in a continuous loop
 ┌─────────────────────────────────────────────────────────────┐
 │                      ralph.sh Loop                          │
 │                                                             │
-│  ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐  │
-│  │  Read   │───▶│  Agent  │───▶│ Update  │───▶│  Commit │  │
-│  │ prd.json│    │  Works  │    │progress │    │ Changes │  │
-│  │         │    │ on Task │    │   .md   │    │         │  │
-│  └─────────┘    └─────────┘    └─────────┘    └─────────┘  │
+│  ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐   │
+│  │  Read   │───▶│  Agent  │───▶│ Update  │───▶│  Commit │   │
+│  │ prd.json│    │  Works  │    │progress │    │ Changes │   │
+│  │         │    │ on Task │    │   .md   │    │         │   │
+│  └─────────┘    └─────────┘    └─────────┘    └─────────┘   │
 │       │                                             │       │
 │       └────────────── Next Iteration ◀──────────────┘       │
 └─────────────────────────────────────────────────────────────┘
