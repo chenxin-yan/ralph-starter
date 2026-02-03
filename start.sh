@@ -6,6 +6,24 @@
 set -e
 
 # =============================================================================
+# Signal handling
+# =============================================================================
+
+# Cleanup function for graceful exit
+cleanup() {
+    echo ""
+    echo -e "\033[0;33m[ralph]\033[0m Interrupted by user. Exiting..."
+    # Log to file if logging is configured (RALPH_LOG_FILE is set after config load)
+    if [[ -n "${RALPH_LOG_FILE:-}" ]]; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] [WARN] Interrupted by user (Ctrl+C)" >> "$RALPH_LOG_FILE"
+    fi
+    exit 130
+}
+
+# Handle Ctrl+C (SIGINT) - clean exit
+trap cleanup INT
+
+# =============================================================================
 # Script directory detection
 # =============================================================================
 
