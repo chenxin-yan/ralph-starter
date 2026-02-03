@@ -1,85 +1,85 @@
 # Project Name
 
-> Replace this with a one-line description of your project.
+> One-line description of the project.
 
 ## Overview
 
-Describe what you're building and the problem it solves. This helps the AI agent understand the context and make informed decisions.
+[2-3 paragraphs explaining what you're building, the problem it solves, and who it's for]
 
 ## Features
 
-List the key features of your project:
-
-- [ ] Feature 1: Description
-- [ ] Feature 2: Description
-- [ ] Feature 3: Description
+- Feature 1
+- Feature 2
+- Feature 3
 
 ## Technical Stack
 
-Define the technologies to be used:
-
-- **Language**: (e.g., TypeScript, Python, Go)
-- **Framework**: (e.g., Next.js, FastAPI, Express)
-- **Database**: (e.g., PostgreSQL, MongoDB, SQLite)
-- **Other**: (e.g., Redis, Docker, AWS)
+- **Language**: [e.g., TypeScript 5.x]
+- **Framework**: [e.g., Next.js 14 with App Router]
+- **Database**: [e.g., PostgreSQL with Prisma ORM]
+- **Authentication**: [e.g., NextAuth.js with JWT]
+- **Testing**: [e.g., Vitest for unit tests, Playwright for E2E]
+- **Other**: [Any other key technologies]
 
 ## Architecture
 
-Describe the high-level architecture:
-
-```
-[Add a diagram or description of your system architecture]
-```
-
-### Directory Structure
-
-```
-project/
-├── src/
-│   ├── ...
-├── tests/
-│   ├── ...
-└── ...
-```
+[Describe the architecture of the project]
 
 ## API Design
 
-If applicable, outline your API endpoints:
+| Method | Endpoint | Description | Auth Required |
+| ------ | -------- | ----------- | ------------- |
+| GET    | /api/... | ...         | Yes/No        |
+| POST   | /api/... | ...         | Yes/No        |
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET    | /api/... | ...         |
-| POST   | /api/... | ...         |
+### Request/Response Examples
+
+[Include example payloads if helpful]
 
 ## Data Models
 
-Define your core data models:
+### ModelName
 
-### Model Name
+| Field     | Type     | Description        | Constraints      |
+| --------- | -------- | ------------------ | ---------------- |
+| id        | UUID     | Primary key        | Required, Unique |
+| createdAt | DateTime | Creation timestamp | Required         |
+| ...       | ...      | ...                | ...              |
 
-| Field | Type   | Description |
-|-------|--------|-------------|
-| id    | UUID   | Primary key |
-| ...   | ...    | ...         |
+[Repeat for each model]
+
+### Relationships
+
+- [Describe relationships: User has many Posts, Post belongs to User, etc.]
 
 ## Constraints & Requirements
 
-List any constraints or non-functional requirements:
+### Performance
 
-- Performance: (e.g., "API response time < 200ms")
-- Security: (e.g., "All endpoints require authentication")
-- Compatibility: (e.g., "Must support Node.js 18+")
+- [e.g., API response time < 200ms for 95th percentile]
+
+### Security
+
+- [e.g., All endpoints require authentication except /api/auth/*]
+- [e.g., Passwords hashed with bcrypt, minimum 12 rounds]
+
+### Compatibility
+
+- [e.g., Node.js 18+, modern browsers only]
+
+### Code Quality
+
+- [e.g., 80% test coverage minimum]
+- [e.g., All code must pass TypeScript strict mode]
 
 ## Out of Scope
 
-Explicitly list what is NOT part of this project:
-
-- Not implementing X
-- Not supporting Y
+- [Feature X - planned for v2]
+- [Integration Y - not needed for MVP]
+- [Edge case Z - will handle later]
 
 ## References
 
-Links to relevant documentation, designs, or resources:
-
-- [Link 1](url)
-- [Link 2](url)
+- [Link to design mockups]
+- [Link to external API docs]
+- [Link to similar projects]
