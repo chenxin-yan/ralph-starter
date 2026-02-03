@@ -30,7 +30,7 @@ Ralph is a shell-based approach to running AI coding agents in a continuous loop
 | `progress.md` | Running log that acts as "memory" between agent sessions       |
 | `PROMPT.md`   | System prompt template that instructs the agent each iteration |
 | `SPEC.md`     | Project specification document describing what you're building |
-| `ralph.sh`    | The orchestration script that runs the agent loop              |
+| `start.sh`    | The orchestration script that runs the agent loop              |
 
 ### Workflow
 
@@ -53,20 +53,35 @@ Ralph is a shell-based approach to running AI coding agents in a continuous loop
 
 ### Setup
 
-1. Clone this starter:
+1. Clone this starter into your project as a `ralph/` subdirectory:
 
    ```bash
-   git clone https://github.com/chenxin-yan/ralph-starter.git my-project
    cd my-project
+   git clone https://github.com/chenxin-yan/ralph-starter.git ralph
+   rm -rf ralph/.git  # Remove Ralph's git history
    ```
 
-2. Configure your agent CLI command (edit `ralph.sh` or set environment variable):
+   Your project structure will look like:
+
+   ```
+   my-project/
+   ├── src/              # Your project files
+   ├── package.json
+   └── ralph/            # Ralph configuration
+       ├── start.sh
+       ├── PROMPT.md
+       ├── SPEC.md
+       ├── prd.json
+       └── progress.md
+   ```
+
+2. Configure your agent CLI command (optional - defaults to `opencode -p -q`):
 
    ```bash
    export RALPH_AGENT_CMD="opencode -p -q"
    ```
 
-3. Write your project spec in `SPEC.md`:
+3. Write your project spec in `ralph/SPEC.md`:
 
    ```markdown
    # My Project
@@ -86,7 +101,7 @@ Ralph is a shell-based approach to running AI coding agents in a continuous loop
    - Use PostgreSQL for database
    ```
 
-4. Create your `prd.json` with tasks:
+4. Create your task list in `ralph/prd.json`:
 
    ```json
    {
@@ -106,19 +121,21 @@ Ralph is a shell-based approach to running AI coding agents in a continuous loop
    }
    ```
 
-5. Run Ralph:
+5. Run Ralph from your project root:
 
    ```bash
-   ./ralph.sh
+   ./ralph/start.sh
    ```
+
+   The agent will run in your project root directory (where you invoke the script), while Ralph's config files are read from `./ralph/`.
 
 ### Options
 
 ```bash
-./ralph.sh                    # Run until all tasks complete
-./ralph.sh --max-loops 10     # Limit to 10 iterations
-./ralph.sh --dry-run          # Show configuration without running
-./ralph.sh --help             # Show help message
+./ralph/start.sh                    # Run until all tasks complete
+./ralph/start.sh --max-loops 10     # Limit to 10 iterations
+./ralph/start.sh --dry-run          # Show configuration without running
+./ralph/start.sh --help             # Show help message
 ```
 
 ## File Formats
@@ -247,13 +264,15 @@ Environment variables:
 | Variable                    | Description                         | Default                                              |
 | --------------------------- | ----------------------------------- | ---------------------------------------------------- |
 | `RALPH_AGENT_CMD`           | Command to invoke the agent CLI     | `opencode -p -q`                                     |
-| `RALPH_PRD_FILE`            | Path to task file                   | `prd.json`                                           |
-| `RALPH_PROGRESS_FILE`       | Path to progress log                | `progress.md`                                        |
-| `RALPH_PROMPT_FILE`         | Path to prompt template             | `PROMPT.md`                                          |
-| `RALPH_SPEC_FILE`           | Path to project spec                | `SPEC.md`                                            |
+| `RALPH_PRD_FILE`            | Path to task file                   | `<script_dir>/prd.json`                              |
+| `RALPH_PROGRESS_FILE`       | Path to progress log                | `<script_dir>/progress.md`                           |
+| `RALPH_PROMPT_FILE`         | Path to prompt template             | `<script_dir>/PROMPT.md`                             |
+| `RALPH_SPEC_FILE`           | Path to project spec                | `<script_dir>/SPEC.md`                               |
 | `RALPH_COMPLETE_SIGNAL`     | String agent outputs when done      | `RALPH_TASK_COMPLETE`                                |
 | `RALPH_RATE_LIMIT_PATTERN`  | Regex pattern to detect rate limits | `rate.limit\|429\|quota.exceeded\|too.many.requests` |
 | `RALPH_RATE_LIMIT_COOLDOWN` | Cooldown period in seconds          | `60`                                                 |
+
+**Note**: `<script_dir>` refers to the directory where `start.sh` is located. This allows you to place all Ralph files in a subdirectory (e.g., `./ralph/`) while the agent runs from your project root.
 
 ## Rate Limit Handling
 

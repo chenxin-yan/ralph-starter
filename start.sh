@@ -6,14 +6,22 @@
 set -e
 
 # =============================================================================
+# Script directory detection
+# =============================================================================
+
+# Resolve the directory where start.sh is located
+# This allows config files to be found relative to the script, not the CWD
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# =============================================================================
 # Configuration (override with environment variables)
 # =============================================================================
 
 RALPH_AGENT_CMD="${RALPH_AGENT_CMD:-opencode -p -q}"
-RALPH_PRD_FILE="${RALPH_PRD_FILE:-prd.json}"
-RALPH_PROGRESS_FILE="${RALPH_PROGRESS_FILE:-progress.md}"
-RALPH_PROMPT_FILE="${RALPH_PROMPT_FILE:-PROMPT.md}"
-RALPH_SPEC_FILE="${RALPH_SPEC_FILE:-SPEC.md}"
+RALPH_PRD_FILE="${RALPH_PRD_FILE:-$SCRIPT_DIR/prd.json}"
+RALPH_PROGRESS_FILE="${RALPH_PROGRESS_FILE:-$SCRIPT_DIR/progress.md}"
+RALPH_PROMPT_FILE="${RALPH_PROMPT_FILE:-$SCRIPT_DIR/PROMPT.md}"
+RALPH_SPEC_FILE="${RALPH_SPEC_FILE:-$SCRIPT_DIR/SPEC.md}"
 RALPH_COMPLETE_SIGNAL="${RALPH_COMPLETE_SIGNAL:-RALPH_TASK_COMPLETE}"
 RALPH_RATE_LIMIT_PATTERN="${RALPH_RATE_LIMIT_PATTERN:-rate.limit|429|quota.exceeded|too.many.requests}"
 RALPH_RATE_LIMIT_COOLDOWN="${RALPH_RATE_LIMIT_COOLDOWN:-60}"
@@ -52,7 +60,7 @@ show_help() {
     cat << EOF
 Ralph - AI Agent Orchestration Script
 
-Usage: ./ralph.sh [OPTIONS]
+Usage: ./start.sh [OPTIONS]
 
 Options:
     --max-loops N       Maximum number of iterations (default: unlimited)
@@ -61,18 +69,24 @@ Options:
 
 Environment Variables:
     RALPH_AGENT_CMD             Agent CLI command (default: opencode -p -q)
-    RALPH_PRD_FILE              Task file path (default: prd.json)
-    RALPH_PROGRESS_FILE         Progress log path (default: progress.md)
-    RALPH_PROMPT_FILE           Prompt template path (default: PROMPT.md)
-    RALPH_SPEC_FILE             Spec file path (default: SPEC.md)
+    RALPH_PRD_FILE              Task file path (default: <script_dir>/prd.json)
+    RALPH_PROGRESS_FILE         Progress log path (default: <script_dir>/progress.md)
+    RALPH_PROMPT_FILE           Prompt template path (default: <script_dir>/PROMPT.md)
+    RALPH_SPEC_FILE             Spec file path (default: <script_dir>/SPEC.md)
     RALPH_COMPLETE_SIGNAL       Completion signal (default: RALPH_TASK_COMPLETE)
     RALPH_RATE_LIMIT_PATTERN    Regex for rate limit detection
     RALPH_RATE_LIMIT_COOLDOWN   Cooldown in seconds (default: 60)
 
+Note:
+    Config files (prd.json, progress.md, PROMPT.md, SPEC.md) are resolved relative
+    to start.sh location by default. This allows you to place all Ralph files in a
+    subdirectory (e.g., ./ralph/) while the agent runs from your project root.
+
 Examples:
-    ./ralph.sh                    # Run until all tasks complete
-    ./ralph.sh --max-loops 5      # Run at most 5 iterations
-    ./ralph.sh --dry-run          # Show configuration without running
+    ./start.sh                    # Run until all tasks complete
+    ./ralph/start.sh              # Run from project root with config in ./ralph/
+    ./start.sh --max-loops 5      # Run at most 5 iterations
+    ./start.sh --dry-run          # Show configuration without running
 
 EOF
 }
