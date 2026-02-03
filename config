@@ -13,8 +13,8 @@
 # Examples:
 #   opencode run            (OpenCode: runs with message as argument)
 #   claude -p               (Claude Code CLI in print/pipe mode)
-#   aider --yes --message   (Aider with auto-confirm, --message takes prompt)
-RALPH_AGENT_CMD="${RALPH_AGENT_CMD:-opencode run}"
+#   claude -p --dangerously-skip-permissions  (Claude Code CLI with auto-approve)
+RALPH_AGENT_CMD="${RALPH_AGENT_CMD:-claude -p --dangerously-skip-permissions}"
 
 # -----------------------------------------------------------------------------
 # Model Selection (OpenCode only)

@@ -1,6 +1,6 @@
 # Ralph Starter
 
-A methodology and automation toolkit for orchestrating long-running AI coding agents through iterative task execution.
+A methodology and automation toolkit for orchestrating long-running AI coding agents through iterative task execution. Inspired by [this video](https://www.youtube.com/watch?v=_IK18goX4X8) and other sources online.
 
 ## Overview
 
@@ -24,13 +24,14 @@ Ralph is a shell-based approach to running AI coding agents in a continuous loop
 
 ### Core Components
 
-| File          | Description                                                    |
-| ------------- | -------------------------------------------------------------- |
-| `prd.json`    | Project task list with small, granular, actionable items       |
-| `progress.md` | Running log that acts as "memory" between agent sessions       |
-| `PROMPT.md`   | System prompt template that instructs the agent each iteration |
-| `SPEC.md`     | Project specification document describing what you're building |
-| `start.sh`    | The orchestration script that runs the agent loop              |
+| File          | Description                                                              |
+| ------------- | ------------------------------------------------------------------------ |
+| `prd.json`    | Project task list with small, granular, actionable items                 |
+| `progress.md` | Running log that acts as "memory" between agent sessions                 |
+| `PROMPT.md`   | System prompt template that instructs the agent each iteration           |
+| `SPEC.md`     | Project specification document describing what you're building           |
+| `start.sh`    | The orchestration script that runs the agent loop                        |
+| `skills/`     | Directory containing skill prompts for creating/iterating on Ralph files |
 
 ### Workflow
 
@@ -85,43 +86,7 @@ Ralph is a shell-based approach to running AI coding agents in a continuous loop
 
 3. Write your project spec in `ralph/SPEC.md`:
 
-   ```markdown
-   # My Project
-
-   ## Overview
-
-   A brief description of what you're building.
-
-   ## Features
-
-   - Feature 1
-   - Feature 2
-
-   ## Technical Requirements
-
-   - Use TypeScript
-   - Use PostgreSQL for database
-   ```
-
 4. Create your task list in `ralph/prd.json`:
-
-   ```json
-   {
-     "tasks": [
-       {
-         "description": "Initialize the project with TypeScript and basic folder structure",
-         "subtasks": [
-           "Run npm init",
-           "Install TypeScript and configure tsconfig.json",
-           "Create src/ directory structure",
-           "Verify with tsc --noEmit"
-         ],
-         "notes": "Use strict TypeScript settings",
-         "passed": false
-       }
-     ]
-   }
-   ```
 
 5. Run Ralph from your project root:
 
@@ -171,32 +136,6 @@ The progress file is **append-only** - the agent adds new entries after each tas
 
 Ralph is configured via the `config` file, which is automatically sourced by `start.sh`. You can also set environment variables, which take precedence over config file values.
 
-### config file
-
-```bash
-# Agent CLI command (prompt is passed as the last argument)
-RALPH_AGENT_CMD="opencode run"
-
-# Model selection (provider/model format, OpenCode only)
-RALPH_MODEL="anthropic/claude-opus-4-5"
-
-# File paths (relative to config file, or absolute)
-RALPH_PRD_FILE="prd.json"
-RALPH_PROGRESS_FILE="progress.md"
-RALPH_PROMPT_FILE="PROMPT.md"
-RALPH_SPEC_FILE="SPEC.md"
-
-# Completion signal
-RALPH_COMPLETE_SIGNAL="RALPH_TASK_COMPLETE"
-
-# Rate limiting
-RALPH_RATE_LIMIT_PATTERN="rate.limit|429|quota.exceeded|too.many.requests"
-RALPH_RATE_LIMIT_COOLDOWN="60"
-
-# Logging (set to empty string to disable)
-RALPH_LOG_FILE="ralph.log"
-```
-
 ### Configuration Reference
 
 | Variable                    | Description                         | Default                                              |
@@ -214,14 +153,6 @@ RALPH_LOG_FILE="ralph.log"
 
 **Note**: File paths can be relative (resolved from `start.sh` directory) or absolute. This allows you to place all Ralph files in a subdirectory (e.g., `./ralph/`) while the agent runs from your project root.
 
-## Rate Limit Handling
-
-The script monitors agent output for rate limit indicators and will:
-
-- Pause execution when rate limits are detected (matches `RALPH_RATE_LIMIT_PATTERN`)
-- Wait for the appropriate cooldown period
-- Resume automatically
-
 ## Logging
 
 Ralph logs all script output and agent responses to `ralph.log` by default. The log includes:
@@ -238,12 +169,39 @@ To disable logging, set `RALPH_LOG_FILE=""` in your config or environment.
 
 Ralph is designed to be CLI-agnostic. The prompt is passed as the **last argument** to the configured command.
 
-| CLI      | Configuration                                      | Notes                                          |
-| -------- | -------------------------------------------------- | ---------------------------------------------- |
-| opencode | `RALPH_AGENT_CMD="opencode run"`                   | Runs with message as argument                  |
-| claude   | `RALPH_AGENT_CMD="claude -p"`                      | `-p` print mode (non-interactive)              |
-| aider    | `RALPH_AGENT_CMD="aider --yes --message"`          | `--yes` auto-confirm, `--message` takes prompt |
-| Custom   | Any CLI that accepts a prompt as the last argument |
+| CLI      | Configuration                                                | Notes                                                                                     |
+| -------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| opencode | `RALPH_AGENT_CMD="opencode run"`                             | Runs with message as argument                                                             |
+| claude   | `RALPH_AGENT_CMD="claude -p --dangerously-skip-permissions"` | `-p` print mode (non-interactive)                                                         |
+| Custom   | `RALPH_AGENT_CMD="<command>"`                                | Any CLI that accepts a prompt as the last argument and allow agent to be run autonomously |
+
+## Skills - Helper Prompts
+
+The `skills/` directory contains specialized prompts to help you create and refine Ralph configuration files:
+
+### CREATE_SPEC.md
+
+A comprehensive guide for creating or refining your `SPEC.md` file. This skill helps you:
+
+- Define clear project overview and features
+- Make explicit technical stack decisions
+- Document API design and data models
+- Set constraints and requirements
+- Define what's out of scope
+
+**Usage**: Load this skill in your AI assistant when creating or iterating on your project specification.
+
+### CREATE_PRD.md
+
+A detailed guide for breaking down your project into actionable tasks in `prd.json`. This skill helps you:
+
+- Create properly-sized tasks (completable in one agent session)
+- Write specific, actionable subtasks
+- Include verification steps for each task
+- Order tasks logically without explicit dependencies
+- Avoid common anti-patterns
+
+**Usage**: Load this skill in your AI assistant when creating or refining your task list. Reference your `SPEC.md` for context.
 
 ## Tips for Writing Good Tasks
 
@@ -252,6 +210,8 @@ Ralph is designed to be CLI-agnostic. The prompt is passed as the **last argumen
 3. **Include verification steps**: Add subtasks for testing and verification
 4. **Provide context**: Use the `notes` field to guide the agent with constraints or tips
 5. **Order logically**: While the agent infers dependencies, ordering tasks logically helps
+
+> **Tip**: Use the `CREATE_PRD.md` skill prompt with your AI assistant to get expert guidance on task breakdown.
 
 ## License
 
