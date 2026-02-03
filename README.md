@@ -189,6 +189,9 @@ RALPH_COMPLETE_SIGNAL="RALPH_TASK_COMPLETE"
 # Rate limiting
 RALPH_RATE_LIMIT_PATTERN="rate.limit|429|quota.exceeded|too.many.requests"
 RALPH_RATE_LIMIT_COOLDOWN="60"
+
+# Logging (set to empty string to disable)
+RALPH_LOG_FILE="ralph.log"
 ```
 
 ### Configuration Reference
@@ -203,6 +206,7 @@ RALPH_RATE_LIMIT_COOLDOWN="60"
 | `RALPH_COMPLETE_SIGNAL`     | String agent outputs when done      | `RALPH_TASK_COMPLETE`                                |
 | `RALPH_RATE_LIMIT_PATTERN`  | Regex pattern to detect rate limits | `rate.limit\|429\|quota.exceeded\|too.many.requests` |
 | `RALPH_RATE_LIMIT_COOLDOWN` | Cooldown period in seconds          | `60`                                                 |
+| `RALPH_LOG_FILE`            | Log file path (empty to disable)    | `ralph.log`                                          |
 
 **Note**: File paths can be relative (resolved from `start.sh` directory) or absolute. This allows you to place all Ralph files in a subdirectory (e.g., `./ralph/`) while the agent runs from your project root.
 
@@ -213,6 +217,18 @@ The script monitors agent output for rate limit indicators and will:
 - Pause execution when rate limits are detected (matches `RALPH_RATE_LIMIT_PATTERN`)
 - Wait for the appropriate cooldown period
 - Resume automatically
+
+## Logging
+
+Ralph logs all script output and agent responses to `ralph.log` by default. The log includes:
+
+- Session start timestamps
+- Iteration markers with task counts
+- Full agent output
+- Completion/error status for each iteration
+- Rate limit events
+
+To disable logging, set `RALPH_LOG_FILE=""` in your config or environment.
 
 ## Supported Agent CLIs
 

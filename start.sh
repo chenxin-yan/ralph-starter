@@ -36,12 +36,14 @@ RALPH_SPEC_FILE="${RALPH_SPEC_FILE:-SPEC.md}"
 RALPH_COMPLETE_SIGNAL="${RALPH_COMPLETE_SIGNAL:-RALPH_TASK_COMPLETE}"
 RALPH_RATE_LIMIT_PATTERN="${RALPH_RATE_LIMIT_PATTERN:-rate.limit|429|quota.exceeded|too.many.requests}"
 RALPH_RATE_LIMIT_COOLDOWN="${RALPH_RATE_LIMIT_COOLDOWN:-60}"
+RALPH_LOG_FILE="${RALPH_LOG_FILE:-ralph.log}"
 
 # Convert relative file paths to absolute (prepend SCRIPT_DIR if not already absolute)
 [[ "$RALPH_PRD_FILE" = /* ]] || RALPH_PRD_FILE="$SCRIPT_DIR/$RALPH_PRD_FILE"
 [[ "$RALPH_PROGRESS_FILE" = /* ]] || RALPH_PROGRESS_FILE="$SCRIPT_DIR/$RALPH_PROGRESS_FILE"
 [[ "$RALPH_PROMPT_FILE" = /* ]] || RALPH_PROMPT_FILE="$SCRIPT_DIR/$RALPH_PROMPT_FILE"
 [[ "$RALPH_SPEC_FILE" = /* ]] || RALPH_SPEC_FILE="$SCRIPT_DIR/$RALPH_SPEC_FILE"
+[[ -z "$RALPH_LOG_FILE" ]] || [[ "$RALPH_LOG_FILE" = /* ]] || RALPH_LOG_FILE="$SCRIPT_DIR/$RALPH_LOG_FILE"
 
 # =============================================================================
 # Colors for output
@@ -54,23 +56,55 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # =============================================================================
+# Logging setup
+# =============================================================================
+
+# Initialize logging - called once at script start
+setup_logging() {
+    if [[ -n "$RALPH_LOG_FILE" ]]; then
+        # Create log file with header
+        {
+            echo "==============================================================================="
+            echo "Ralph Session Started: $(date '+%Y-%m-%d %H:%M:%S')"
+            echo "==============================================================================="
+            echo ""
+        } >> "$RALPH_LOG_FILE"
+    fi
+}
+
+# Log a message to the log file with timestamp (no terminal output)
+log_to_file() {
+    if [[ -n "$RALPH_LOG_FILE" ]]; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1" >> "$RALPH_LOG_FILE"
+    fi
+}
+
+# =============================================================================
 # Helper functions
 # =============================================================================
 
 log_info() {
-    echo -e "${BLUE}[ralph]${NC} $1"
+    local msg="${BLUE}[ralph]${NC} $1"
+    echo -e "$msg"
+    log_to_file "[INFO] $1"
 }
 
 log_success() {
-    echo -e "${GREEN}[ralph]${NC} $1"
+    local msg="${GREEN}[ralph]${NC} $1"
+    echo -e "$msg"
+    log_to_file "[SUCCESS] $1"
 }
 
 log_warn() {
-    echo -e "${YELLOW}[ralph]${NC} $1"
+    local msg="${YELLOW}[ralph]${NC} $1"
+    echo -e "$msg"
+    log_to_file "[WARN] $1"
 }
 
 log_error() {
-    echo -e "${RED}[ralph]${NC} $1"
+    local msg="${RED}[ralph]${NC} $1"
+    echo -e "$msg"
+    log_to_file "[ERROR] $1"
 }
 
 show_help() {
@@ -96,6 +130,7 @@ Configuration:
     RALPH_COMPLETE_SIGNAL       Completion signal (default: RALPH_TASK_COMPLETE)
     RALPH_RATE_LIMIT_PATTERN    Regex for rate limit detection
     RALPH_RATE_LIMIT_COOLDOWN   Cooldown in seconds (default: 60)
+    RALPH_LOG_FILE              Log file path (default: ralph.log, empty to disable)
 
 Note:
     File paths in config can be relative (to start.sh directory) or absolute.
@@ -166,12 +201,18 @@ run_agent() {
     
     # Run agent and capture output, also display in real-time
     # The prompt is passed via stdin or as an argument depending on the CLI
-    if echo "$prompt" | $RALPH_AGENT_CMD 2>&1 | tee "$output_file"; then
-        # Check for completion signal
-        if grep -q "$RALPH_COMPLETE_SIGNAL" "$output_file"; then
-            rm -f "$output_file"
-            return 0
-        fi
+    # Output goes to: terminal (real-time), temp file (for signal detection), and log file
+    if [[ -n "$RALPH_LOG_FILE" ]]; then
+        echo "$prompt" | $RALPH_AGENT_CMD 2>&1 | tee "$output_file" | tee -a "$RALPH_LOG_FILE"
+    else
+        echo "$prompt" | $RALPH_AGENT_CMD 2>&1 | tee "$output_file"
+    fi
+    local agent_exit_code=${PIPESTATUS[1]}
+    
+    # Check for completion signal
+    if grep -q "$RALPH_COMPLETE_SIGNAL" "$output_file"; then
+        rm -f "$output_file"
+        return 0
     fi
     
     # Check for rate limiting
@@ -204,6 +245,11 @@ show_dry_run() {
     echo "  Complete Signal:    $RALPH_COMPLETE_SIGNAL"
     echo "  Rate Limit Pattern: $RALPH_RATE_LIMIT_PATTERN"
     echo "  Rate Limit Cooldown: ${RALPH_RATE_LIMIT_COOLDOWN}s"
+    if [[ -n "$RALPH_LOG_FILE" ]]; then
+        echo "  Log File:           $RALPH_LOG_FILE"
+    else
+        echo "  Log File:           (disabled)"
+    fi
     echo "  Max Loops:          ${MAX_LOOPS:-unlimited}"
     echo ""
     
@@ -278,6 +324,9 @@ main() {
     if [[ ! -f "$RALPH_PROGRESS_FILE" ]]; then
         touch "$RALPH_PROGRESS_FILE"
     fi
+
+    # Initialize logging
+    setup_logging
 
     log_info "Starting Ralph orchestration loop"
     log_info "Agent: $RALPH_AGENT_CMD"

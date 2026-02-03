@@ -44,3 +44,10 @@ RALPH_RATE_LIMIT_PATTERN="${RALPH_RATE_LIMIT_PATTERN:-rate.limit|429|quota.excee
 
 # Cooldown period in seconds when rate limit is detected
 RALPH_RATE_LIMIT_COOLDOWN="${RALPH_RATE_LIMIT_COOLDOWN:-60}"
+
+# -----------------------------------------------------------------------------
+# Logging
+# -----------------------------------------------------------------------------
+# Log file for script output. To disable logging, comment out or set to empty:
+# RALPH_LOG_FILE=""
+RALPH_LOG_FILE="${RALPH_LOG_FILE:-ralph.log}"
