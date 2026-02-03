@@ -46,7 +46,8 @@ fi
 # Configuration defaults (if not set by config file or environment)
 # =============================================================================
 
-RALPH_AGENT_CMD="${RALPH_AGENT_CMD:-opencode -p -q}"
+RALPH_AGENT_CMD="${RALPH_AGENT_CMD:-opencode run}"
+RALPH_MODEL="${RALPH_MODEL:-anthropic/claude-opus-4-5}"
 RALPH_PRD_FILE="${RALPH_PRD_FILE:-prd.json}"
 RALPH_PROGRESS_FILE="${RALPH_PROGRESS_FILE:-progress.md}"
 RALPH_PROMPT_FILE="${RALPH_PROMPT_FILE:-PROMPT.md}"
@@ -140,7 +141,8 @@ Configuration:
     Ralph automatically loads ./config if it exists. You can also set these
     as environment variables (which take precedence over config file values):
 
-    RALPH_AGENT_CMD             Agent CLI command (default: opencode -p -q)
+    RALPH_AGENT_CMD             Agent CLI command (default: opencode run)
+    RALPH_MODEL                 Model in provider/model format (default: anthropic/claude-opus-4-20250514)
     RALPH_PRD_FILE              Task file path (default: prd.json)
     RALPH_PROGRESS_FILE         Progress log path (default: progress.md)
     RALPH_PROMPT_FILE           Prompt template path (default: PROMPT.md)
@@ -217,15 +219,21 @@ run_agent() {
     
     log_info "Starting agent..."
     
+    # Build the full command with model flag if specified
+    local agent_cmd="$RALPH_AGENT_CMD"
+    if [[ -n "$RALPH_MODEL" ]]; then
+        agent_cmd="$RALPH_AGENT_CMD -m $RALPH_MODEL"
+    fi
+    
     # Run agent and capture output, also display in real-time
-    # The prompt is passed via stdin or as an argument depending on the CLI
+    # The prompt is passed as the LAST argument to the agent command
     # Output goes to: terminal (real-time), temp file (for signal detection), and log file
     if [[ -n "$RALPH_LOG_FILE" ]]; then
-        echo "$prompt" | $RALPH_AGENT_CMD 2>&1 | tee "$output_file" | tee -a "$RALPH_LOG_FILE"
+        $agent_cmd "$prompt" 2>&1 | tee "$output_file" | tee -a "$RALPH_LOG_FILE"
     else
-        echo "$prompt" | $RALPH_AGENT_CMD 2>&1 | tee "$output_file"
+        $agent_cmd "$prompt" 2>&1 | tee "$output_file"
     fi
-    local agent_exit_code=${PIPESTATUS[1]}
+    local agent_exit_code=${PIPESTATUS[0]}
     
     # Check for completion signal
     if grep -q "$RALPH_COMPLETE_SIGNAL" "$output_file"; then
@@ -256,6 +264,11 @@ show_dry_run() {
         echo "  Config File:        (not found, using defaults)"
     fi
     echo "  Agent Command:      $RALPH_AGENT_CMD"
+    if [[ -n "$RALPH_MODEL" ]]; then
+        echo "  Model:              $RALPH_MODEL"
+    else
+        echo "  Model:              (using agent default)"
+    fi
     echo "  Task File:          $RALPH_PRD_FILE"
     echo "  Progress File:      $RALPH_PROGRESS_FILE"
     echo "  Prompt File:        $RALPH_PROMPT_FILE"

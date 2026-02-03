@@ -76,7 +76,7 @@ Ralph is a shell-based approach to running AI coding agents in a continuous loop
        └── progress.md
    ```
 
-2. Configure your agent CLI in `ralph/config` (optional - defaults to `opencode -p -q`):
+2. Configure your agent CLI in `ralph/config` (optional - defaults to `opencode run`):
 
    ```bash
    # Edit ralph/config and change RALPH_AGENT_CMD
@@ -174,8 +174,11 @@ Ralph is configured via the `config` file, which is automatically sourced by `st
 ### config file
 
 ```bash
-# Agent CLI command
-RALPH_AGENT_CMD="opencode -p -q"
+# Agent CLI command (prompt is passed as the last argument)
+RALPH_AGENT_CMD="opencode run"
+
+# Model selection (provider/model format, OpenCode only)
+RALPH_MODEL="anthropic/claude-opus-4-5"
 
 # File paths (relative to config file, or absolute)
 RALPH_PRD_FILE="prd.json"
@@ -198,7 +201,8 @@ RALPH_LOG_FILE="ralph.log"
 
 | Variable                    | Description                         | Default                                              |
 | --------------------------- | ----------------------------------- | ---------------------------------------------------- |
-| `RALPH_AGENT_CMD`           | Command to invoke the agent CLI     | `opencode -p -q`                                     |
+| `RALPH_AGENT_CMD`           | Command to invoke the agent CLI     | `opencode run`                                       |
+| `RALPH_MODEL`               | Model in provider/model format      | `anthropic/claude-opus-4-5`                          |
 | `RALPH_PRD_FILE`            | Path to task file                   | `prd.json`                                           |
 | `RALPH_PROGRESS_FILE`       | Path to progress log                | `progress.md`                                        |
 | `RALPH_PROMPT_FILE`         | Path to prompt template             | `PROMPT.md`                                          |
@@ -232,14 +236,14 @@ To disable logging, set `RALPH_LOG_FILE=""` in your config or environment.
 
 ## Supported Agent CLIs
 
-Ralph is designed to be CLI-agnostic. Configure your agent command:
+Ralph is designed to be CLI-agnostic. The prompt is passed as the **last argument** to the configured command.
 
-| CLI      | Configuration                          |
-| -------- | -------------------------------------- |
-| opencode | `RALPH_AGENT_CMD="opencode -p -q"`     |
-| claude   | `RALPH_AGENT_CMD="claude -p"`          |
-| aider    | `RALPH_AGENT_CMD="aider --message"`    |
-| Custom   | Any CLI that accepts a prompt argument |
+| CLI      | Configuration                                      | Notes                                          |
+| -------- | -------------------------------------------------- | ---------------------------------------------- |
+| opencode | `RALPH_AGENT_CMD="opencode run"`                   | Runs with message as argument                  |
+| claude   | `RALPH_AGENT_CMD="claude -p"`                      | `-p` print mode (non-interactive)              |
+| aider    | `RALPH_AGENT_CMD="aider --yes --message"`          | `--yes` auto-confirm, `--message` takes prompt |
+| Custom   | Any CLI that accepts a prompt as the last argument |
 
 ## Tips for Writing Good Tasks
 

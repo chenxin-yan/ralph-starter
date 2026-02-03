@@ -9,11 +9,25 @@
 # Agent Command
 # -----------------------------------------------------------------------------
 # The CLI command used to run the AI agent.
+# The prompt will be passed as the LAST argument to this command.
 # Examples:
-#   opencode -p -q          (OpenCode in pipe mode, quiet)
-#   claude --print          (Claude Code CLI)
-#   aider --yes             (Aider with auto-confirm)
-RALPH_AGENT_CMD="${RALPH_AGENT_CMD:-opencode -p -q}"
+#   opencode run            (OpenCode: runs with message as argument)
+#   claude -p               (Claude Code CLI in print/pipe mode)
+#   aider --yes --message   (Aider with auto-confirm, --message takes prompt)
+RALPH_AGENT_CMD="${RALPH_AGENT_CMD:-opencode run}"
+
+# -----------------------------------------------------------------------------
+# Model Selection (OpenCode only)
+# -----------------------------------------------------------------------------
+# Model to use in the format "provider/model". Leave empty to use agent default.
+# Examples:
+#   anthropic/claude-opus-4-5
+#   anthropic/claude-sonnet-4-5
+#   openai/gpt-4o
+#   google/gemini-2.5-pro
+#   ollama/qwen3:8b-16k
+# Run "opencode models" to see all available models.
+RALPH_MODEL="${RALPH_MODEL:-anthropic/claude-opus-4-5}"
 
 # -----------------------------------------------------------------------------
 # File Paths
