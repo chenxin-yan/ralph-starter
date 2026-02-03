@@ -69,16 +69,18 @@ Ralph is a shell-based approach to running AI coding agents in a continuous loop
    ├── package.json
    └── ralph/            # Ralph configuration
        ├── start.sh
+       ├── config
        ├── PROMPT.md
        ├── SPEC.md
        ├── prd.json
        └── progress.md
    ```
 
-2. Configure your agent CLI command (optional - defaults to `opencode -p -q`):
+2. Configure your agent CLI in `ralph/config` (optional - defaults to `opencode -p -q`):
 
    ```bash
-   export RALPH_AGENT_CMD="opencode -p -q"
+   # Edit ralph/config and change RALPH_AGENT_CMD
+   RALPH_AGENT_CMD="claude -p"  # Example: use Claude CLI instead
    ```
 
 3. Write your project spec in `ralph/SPEC.md`:
@@ -167,20 +169,42 @@ The progress file is **append-only** - the agent adds new entries after each tas
 
 ## Configuration
 
-Environment variables:
+Ralph is configured via the `config` file, which is automatically sourced by `start.sh`. You can also set environment variables, which take precedence over config file values.
+
+### config file
+
+```bash
+# Agent CLI command
+RALPH_AGENT_CMD="opencode -p -q"
+
+# File paths (relative to config file, or absolute)
+RALPH_PRD_FILE="prd.json"
+RALPH_PROGRESS_FILE="progress.md"
+RALPH_PROMPT_FILE="PROMPT.md"
+RALPH_SPEC_FILE="SPEC.md"
+
+# Completion signal
+RALPH_COMPLETE_SIGNAL="RALPH_TASK_COMPLETE"
+
+# Rate limiting
+RALPH_RATE_LIMIT_PATTERN="rate.limit|429|quota.exceeded|too.many.requests"
+RALPH_RATE_LIMIT_COOLDOWN="60"
+```
+
+### Configuration Reference
 
 | Variable                    | Description                         | Default                                              |
 | --------------------------- | ----------------------------------- | ---------------------------------------------------- |
 | `RALPH_AGENT_CMD`           | Command to invoke the agent CLI     | `opencode -p -q`                                     |
-| `RALPH_PRD_FILE`            | Path to task file                   | `<script_dir>/prd.json`                              |
-| `RALPH_PROGRESS_FILE`       | Path to progress log                | `<script_dir>/progress.md`                           |
-| `RALPH_PROMPT_FILE`         | Path to prompt template             | `<script_dir>/PROMPT.md`                             |
-| `RALPH_SPEC_FILE`           | Path to project spec                | `<script_dir>/SPEC.md`                               |
+| `RALPH_PRD_FILE`            | Path to task file                   | `prd.json`                                           |
+| `RALPH_PROGRESS_FILE`       | Path to progress log                | `progress.md`                                        |
+| `RALPH_PROMPT_FILE`         | Path to prompt template             | `PROMPT.md`                                          |
+| `RALPH_SPEC_FILE`           | Path to project spec                | `SPEC.md`                                            |
 | `RALPH_COMPLETE_SIGNAL`     | String agent outputs when done      | `RALPH_TASK_COMPLETE`                                |
 | `RALPH_RATE_LIMIT_PATTERN`  | Regex pattern to detect rate limits | `rate.limit\|429\|quota.exceeded\|too.many.requests` |
 | `RALPH_RATE_LIMIT_COOLDOWN` | Cooldown period in seconds          | `60`                                                 |
 
-**Note**: `<script_dir>` refers to the directory where `start.sh` is located. This allows you to place all Ralph files in a subdirectory (e.g., `./ralph/`) while the agent runs from your project root.
+**Note**: File paths can be relative (resolved from `start.sh` directory) or absolute. This allows you to place all Ralph files in a subdirectory (e.g., `./ralph/`) while the agent runs from your project root.
 
 ## Rate Limit Handling
 

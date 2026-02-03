@@ -14,17 +14,34 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # =============================================================================
-# Configuration (override with environment variables)
+# Load configuration
+# =============================================================================
+
+# Auto-source config file if it exists (environment variables take precedence)
+RALPH_CONFIG_FILE="$SCRIPT_DIR/config"
+if [[ -f "$RALPH_CONFIG_FILE" ]]; then
+    source "$RALPH_CONFIG_FILE"
+    RALPH_CONFIG_LOADED=true
+fi
+
+# =============================================================================
+# Configuration defaults (if not set by config file or environment)
 # =============================================================================
 
 RALPH_AGENT_CMD="${RALPH_AGENT_CMD:-opencode -p -q}"
-RALPH_PRD_FILE="${RALPH_PRD_FILE:-$SCRIPT_DIR/prd.json}"
-RALPH_PROGRESS_FILE="${RALPH_PROGRESS_FILE:-$SCRIPT_DIR/progress.md}"
-RALPH_PROMPT_FILE="${RALPH_PROMPT_FILE:-$SCRIPT_DIR/PROMPT.md}"
-RALPH_SPEC_FILE="${RALPH_SPEC_FILE:-$SCRIPT_DIR/SPEC.md}"
+RALPH_PRD_FILE="${RALPH_PRD_FILE:-prd.json}"
+RALPH_PROGRESS_FILE="${RALPH_PROGRESS_FILE:-progress.md}"
+RALPH_PROMPT_FILE="${RALPH_PROMPT_FILE:-PROMPT.md}"
+RALPH_SPEC_FILE="${RALPH_SPEC_FILE:-SPEC.md}"
 RALPH_COMPLETE_SIGNAL="${RALPH_COMPLETE_SIGNAL:-RALPH_TASK_COMPLETE}"
 RALPH_RATE_LIMIT_PATTERN="${RALPH_RATE_LIMIT_PATTERN:-rate.limit|429|quota.exceeded|too.many.requests}"
 RALPH_RATE_LIMIT_COOLDOWN="${RALPH_RATE_LIMIT_COOLDOWN:-60}"
+
+# Convert relative file paths to absolute (prepend SCRIPT_DIR if not already absolute)
+[[ "$RALPH_PRD_FILE" = /* ]] || RALPH_PRD_FILE="$SCRIPT_DIR/$RALPH_PRD_FILE"
+[[ "$RALPH_PROGRESS_FILE" = /* ]] || RALPH_PROGRESS_FILE="$SCRIPT_DIR/$RALPH_PROGRESS_FILE"
+[[ "$RALPH_PROMPT_FILE" = /* ]] || RALPH_PROMPT_FILE="$SCRIPT_DIR/$RALPH_PROMPT_FILE"
+[[ "$RALPH_SPEC_FILE" = /* ]] || RALPH_SPEC_FILE="$SCRIPT_DIR/$RALPH_SPEC_FILE"
 
 # =============================================================================
 # Colors for output
@@ -67,20 +84,23 @@ Options:
     --dry-run           Show what would be executed without running
     --help              Show this help message
 
-Environment Variables:
+Configuration:
+    Ralph automatically loads ./config if it exists. You can also set these
+    as environment variables (which take precedence over config file values):
+
     RALPH_AGENT_CMD             Agent CLI command (default: opencode -p -q)
-    RALPH_PRD_FILE              Task file path (default: <script_dir>/prd.json)
-    RALPH_PROGRESS_FILE         Progress log path (default: <script_dir>/progress.md)
-    RALPH_PROMPT_FILE           Prompt template path (default: <script_dir>/PROMPT.md)
-    RALPH_SPEC_FILE             Spec file path (default: <script_dir>/SPEC.md)
+    RALPH_PRD_FILE              Task file path (default: prd.json)
+    RALPH_PROGRESS_FILE         Progress log path (default: progress.md)
+    RALPH_PROMPT_FILE           Prompt template path (default: PROMPT.md)
+    RALPH_SPEC_FILE             Spec file path (default: SPEC.md)
     RALPH_COMPLETE_SIGNAL       Completion signal (default: RALPH_TASK_COMPLETE)
     RALPH_RATE_LIMIT_PATTERN    Regex for rate limit detection
     RALPH_RATE_LIMIT_COOLDOWN   Cooldown in seconds (default: 60)
 
 Note:
-    Config files (prd.json, progress.md, PROMPT.md, SPEC.md) are resolved relative
-    to start.sh location by default. This allows you to place all Ralph files in a
-    subdirectory (e.g., ./ralph/) while the agent runs from your project root.
+    File paths in config can be relative (to start.sh directory) or absolute.
+    This allows you to place all Ralph files in a subdirectory (e.g., ./ralph/)
+    while the agent runs from your project root.
 
 Examples:
     ./start.sh                    # Run until all tasks complete
@@ -110,7 +130,7 @@ check_requirements() {
     fi
 
     if ! command -v jq &> /dev/null; then
-        log_error "jq is required but not installed. Install with: brew install jq"
+        log_error "jq is required but not installed."
         missing=1
     fi
 
@@ -171,6 +191,11 @@ show_dry_run() {
     log_info "=== DRY RUN MODE ==="
     echo ""
     echo "Configuration:"
+    if [[ "$RALPH_CONFIG_LOADED" == true ]]; then
+        echo "  Config File:        $RALPH_CONFIG_FILE (loaded)"
+    else
+        echo "  Config File:        (not found, using defaults)"
+    fi
     echo "  Agent Command:      $RALPH_AGENT_CMD"
     echo "  Task File:          $RALPH_PRD_FILE"
     echo "  Progress File:      $RALPH_PROGRESS_FILE"
