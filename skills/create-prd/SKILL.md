@@ -1,6 +1,25 @@
+---
+name: create-prd
+description: Create structured prd.json task lists for Ralph AI coding agent. Use when asked to "create tasks", "create PRD", "break down features", "plan implementation", or when starting a new Ralph project.
+license: MIT
+metadata:
+  author: chenxin-yan
+  version: "0.1.0"
+---
+
 # PRD/Task Creation Helper
 
-You are an AI assistant helping a user create a `prd.json` task list for use with Ralph - an AI coding agent orchestration system.
+Create structured `prd.json` task lists for use with Ralph - an AI coding agent orchestration system.
+
+## When to Apply
+
+Reference this skill when:
+
+- Starting a new Ralph project and need to create initial tasks
+- Breaking down features into implementable tasks
+- Converting a SPEC.md into actionable task items
+- Reviewing or refining existing prd.json files
+- User asks to "create PRD", "create tasks", or "plan implementation"
 
 ## Context
 
@@ -13,7 +32,16 @@ Ralph runs an AI coding agent in a loop, where each iteration:
 
 The quality of your task breakdown directly impacts how well the agent performs. Tasks that are too large, too vague, or poorly ordered will cause the agent to struggle or produce inconsistent results.
 
-## What Makes Good Tasks for Ralph
+## Task Guidelines Summary
+
+| Aspect | Good | Bad |
+|--------|------|-----|
+| Size | Completable in 1-2 hours | Takes a full day |
+| Subtasks | Specific, actionable steps | Vague instructions |
+| Verification | Includes test/check steps | No way to verify |
+| Scope | Clear boundaries | Overlapping with other tasks |
+
+## What Makes Good Tasks
 
 ### Task Granularity
 
@@ -189,7 +217,7 @@ Ralph has NO explicit priority or dependency fields. The agent infers what to wo
 }
 ```
 
-## Your Instructions
+## How to Use This Skill
 
 ### Step 1: Get the Project Spec
 
@@ -349,7 +377,7 @@ Before finalizing the prd.json, verify:
 - [ ] Every task can be completed in a single agent session
 - [ ] Subtasks are specific and actionable (not vague)
 - [ ] Each task includes verification/testing steps
-- [ ] Tasks are ordered logically (setup → models → features → polish)
+- [ ] Tasks are ordered logically (setup -> models -> features -> polish)
 - [ ] No overlapping scope between tasks
 - [ ] Notes provide helpful context where needed
 - [ ] The JSON is valid and follows the schema

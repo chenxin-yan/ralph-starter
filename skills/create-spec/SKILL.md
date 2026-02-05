@@ -1,6 +1,25 @@
+---
+name: create-spec
+description: Create or refine SPEC.md technical specifications for Ralph AI coding agent. Use when asked to "create spec", "write specification", "define requirements", "plan architecture", or when setting up a new project.
+license: MIT
+metadata:
+  author: chenxin-yan
+  version: "0.1.0"
+---
+
 # SPEC Creation Helper
 
-You are an AI assistant helping a user create or refine a `SPEC.md` file for use with Ralph - an AI coding agent orchestration system.
+Create or refine `SPEC.md` files for use with Ralph - an AI coding agent orchestration system.
+
+## When to Apply
+
+Reference this skill when:
+
+- Starting a new project and need to define requirements
+- Converting user ideas into structured specifications
+- Reviewing or improving existing SPEC.md files
+- User asks to "create spec", "write specification", or "define requirements"
+- Planning architecture before implementation
 
 ## Context
 
@@ -11,7 +30,17 @@ Ralph is a methodology for running AI coding agents in a continuous loop. The ag
 - It prevents scope creep by defining boundaries
 - It ensures consistency across multiple agent sessions
 
-## What Makes a Good SPEC.md for Ralph
+## SPEC.md Quality Checklist
+
+| Section         | Required    | Purpose                         |
+| --------------- | ----------- | ------------------------------- |
+| Overview        | Yes         | What, why, and who              |
+| Features        | Yes         | Concrete, testable requirements |
+| Technical Stack | Yes         | Eliminate technology guesswork  |
+| Architecture    | Recommended | System structure guidance       |
+| Constraints     | Recommended | Non-functional requirements     |
+
+## What Makes a Good SPEC.md
 
 ### 1. Overview
 
@@ -46,21 +75,7 @@ Help the agent understand the system structure:
 - Key architectural patterns (MVC, Clean Architecture, etc.)
 - How components communicate
 
-### 5. API Design (if applicable)
-
-- Endpoint definitions with methods and paths
-- Request/response formats
-- Authentication requirements
-- Error response formats
-
-### 6. Data Models (if applicable)
-
-- Define core entities with their fields and types
-- Specify relationships between models
-- Note any constraints (unique, required, etc.)
-- Include example data if helpful
-
-### 7. Constraints & Requirements
+### 5. Requirements
 
 Non-functional requirements that guide implementation:
 
@@ -69,17 +84,7 @@ Non-functional requirements that guide implementation:
 - **Compatibility**: Node version, browser support, OS requirements
 - **Code Quality**: Testing requirements, linting rules, type safety
 
-### 8. Out of Scope
-
-Explicitly state what the project will NOT include:
-
-- Features deferred to future versions
-- Integrations not needed for now
-- Edge cases you're intentionally not handling
-
-This prevents the agent from over-engineering or adding unrequested features.
-
-### 9. References
+### 6. References
 
 Link to relevant resources:
 
@@ -135,7 +140,7 @@ A spec without "Out of Scope" invites scope creep. The agent may:
 
 Always define what the project will NOT do.
 
-## Your Instructions
+## How to Use This Skill
 
 ### If the user has an existing SPEC.md
 
@@ -167,11 +172,7 @@ Guide the user through these questions:
    - Is this a monolith, microservices, or serverless?
    - What's the expected directory structure?
 
-5. **Data**
-   - What are the core entities/models?
-   - How do they relate to each other?
-
-6. **Constraints**
+5. **Constraints**
    - Any performance requirements?
    - Security considerations?
    - Compatibility requirements?
@@ -208,58 +209,14 @@ Generate a complete `SPEC.md` following this template structure:
 
 [Describe the architecture of the project]
 
-## API Design
-
-| Method | Endpoint | Description | Auth Required |
-| ------ | -------- | ----------- | ------------- |
-| GET    | /api/... | ...         | Yes/No        |
-| POST   | /api/... | ...         | Yes/No        |
-
-### Request/Response Examples
-
-[Include example payloads if helpful]
-
-## Data Models
-
-### ModelName
-
-| Field     | Type     | Description        | Constraints      |
-| --------- | -------- | ------------------ | ---------------- |
-| id        | UUID     | Primary key        | Required, Unique |
-| createdAt | DateTime | Creation timestamp | Required         |
-| ...       | ...      | ...                | ...              |
-
-[Repeat for each model]
-
-### Relationships
-
-- [Describe relationships: User has many Posts, Post belongs to User, etc.]
-
-## Constraints & Requirements
-
-### Performance
+## Requirements
 
 - [e.g., API response time < 200ms for 95th percentile]
-
-### Security
-
 - [e.g., All endpoints require authentication except /api/auth/*]
 - [e.g., Passwords hashed with bcrypt, minimum 12 rounds]
-
-### Compatibility
-
 - [e.g., Node.js 18+, modern browsers only]
-
-### Code Quality
-
 - [e.g., 80% test coverage minimum]
 - [e.g., All code must pass TypeScript strict mode]
-
-## Out of Scope
-
-- [Feature X - planned for v2]
-- [Integration Y - not needed for MVP]
-- [Edge case Z - will handle later]
 
 ## References
 
@@ -275,8 +232,5 @@ Before finalizing, ensure the spec:
 - [ ] Has a clear, specific project overview
 - [ ] Lists concrete, implementable features
 - [ ] Specifies all major technology choices
-- [ ] Documents API endpoints (if applicable)
 - [ ] Defines data models with field types
-- [ ] States constraints and requirements
-- [ ] Explicitly lists what's out of scope
-- [ ] Is detailed enough that an AI agent can implement without guessing
+- [ ] States requirements
