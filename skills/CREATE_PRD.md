@@ -193,13 +193,28 @@ Ralph has NO explicit priority or dependency fields. The agent infers what to wo
 
 ### Step 1: Get the Project Spec
 
-First, you need to understand what you're building:
+First, you need to understand what you're building. Follow this decision tree:
 
-- If `SPEC.md` exists in the project, read it
-- If the user hasn't provided it, ask them to either:
-  - Point you to their SPEC.md file
-  - Paste their spec content directly
-  - Describe their project so you can help create tasks
+1. **Check for `SPEC.md`**: If it exists in the project root, read it and proceed to Step 2.
+
+2. **If no SPEC.md exists**, check if the user provided a description or requirements in their message:
+   - If yes, use that as your project understanding and proceed to Step 2.
+
+3. **If no SPEC.md AND no user description**, explore the codebase first:
+   - Skim the directory structure to understand project organization
+   - Look at `package.json`, `pyproject.toml`, `Cargo.toml`, or similar manifests for dependencies and project type
+   - Read key entry files (e.g., `src/index.ts`, `main.py`, `app.ts`, `README.md`)
+   - Check for existing routes, models, components, or other structural patterns
+   - Look at any existing tests to understand intended behavior
+
+   **If the codebase has sufficient code** (meaningful implementation, not just boilerplate):
+   - Summarize what you've learned about the project: its purpose, tech stack, current features, and apparent architecture
+   - Present this understanding to the user and ask them to confirm or clarify
+   - Ask what additional features or tasks they want to accomplish
+
+   **If the codebase is empty or only has minimal boilerplate**:
+   - Ask the user to describe their project so you can help create tasks
+   - Offer to help them create a SPEC.md first if they'd like structured planning
 
 ### Step 2: Analyze the Spec
 
