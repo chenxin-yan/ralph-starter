@@ -1,6 +1,6 @@
 ---
 name: create-prd
-description: Create structured prd.json task lists for Ralph AI coding agent. Use when asked to "create tasks", "create PRD", "break down features", "plan implementation", or when starting a new Ralph project.
+description: Create and manage prd.json task lists for Ralph AI coding agent. Use when asked to "create tasks", "add task", "create PRD", "break down features", "plan implementation", or when managing Ralph project tasks.
 license: MIT
 metadata:
   author: chenxin-yan
@@ -9,17 +9,19 @@ metadata:
 
 # PRD/Task Creation Helper
 
-Create structured `prd.json` task lists for use with Ralph - an AI coding agent orchestration system.
+Create and manage `prd.json` task lists for use with Ralph - an AI coding agent orchestration system.
 
 ## When to Apply
 
 Reference this skill when:
 
+- User asks to create, add, update, or manage tasks for Ralph
 - Starting a new Ralph project and need to create initial tasks
+- Adding a single task or a few tasks incrementally
 - Breaking down features into implementable tasks
 - Converting a SPEC.md into actionable task items
 - Reviewing or refining existing prd.json files
-- User asks to "create PRD", "create tasks", or "plan implementation"
+- User asks to "create PRD", "create tasks", "add task", or "plan implementation"
 
 ## Context
 
@@ -34,12 +36,12 @@ The quality of your task breakdown directly impacts how well the agent performs.
 
 ## Task Guidelines Summary
 
-| Aspect | Good | Bad |
-|--------|------|-----|
-| Size | Completable in 1-2 hours | Takes a full day |
-| Subtasks | Specific, actionable steps | Vague instructions |
-| Verification | Includes test/check steps | No way to verify |
-| Scope | Clear boundaries | Overlapping with other tasks |
+| Aspect       | Good                       | Bad                          |
+| ------------ | -------------------------- | ---------------------------- |
+| Size         | Completable in 1-2 hours   | Takes a full day             |
+| Subtasks     | Specific, actionable steps | Vague instructions           |
+| Verification | Includes test/check steps  | No way to verify             |
+| Scope        | Clear boundaries           | Overlapping with other tasks |
 
 ## What Makes Good Tasks
 
@@ -219,14 +221,33 @@ Ralph has NO explicit priority or dependency fields. The agent infers what to wo
 
 ## How to Use This Skill
 
-### Step 1: Get the Project Spec
+This skill supports two main workflows:
+
+1. **Full PRD Creation**: Creating a complete task list from a spec or project description
+2. **Incremental Task Management**: Adding tasks one by one as the user requests them
+
+### Workflow Selection
+
+**Follow what the user asks you to do.** Determine the workflow based on the user's request:
+
+- If user asks to "create PRD", "create all tasks", "plan the project", or "break down [feature/spec]" → Use **Full PRD Creation**
+- If user asks to "add a task", "create a task for X", or describes a single feature to add → Use **Incremental Task Management**
+- If unclear, ask the user which approach they prefer
+
+---
+
+## Workflow A: Full PRD Creation
+
+Use this workflow when creating a complete task list from scratch.
+
+### Step A1: Get the Project Spec
 
 First, you need to understand what you're building. Follow this decision tree:
 
-1. **Check for `SPEC.md`**: If it exists in the project root, read it and proceed to Step 2.
+1. **Check for `SPEC.md`**: If it exists in the project root, read it and proceed to Step A2.
 
 2. **If no SPEC.md exists**, check if the user provided a description or requirements in their message:
-   - If yes, use that as your project understanding and proceed to Step 2.
+   - If yes, use that as your project understanding and proceed to Step A2.
 
 3. **If no SPEC.md AND no user description**, explore the codebase first:
    - Skim the directory structure to understand project organization
@@ -244,7 +265,7 @@ First, you need to understand what you're building. Follow this decision tree:
    - Ask the user to describe their project so you can help create tasks
    - Offer to help them create a SPEC.md first if they'd like structured planning
 
-### Step 2: Analyze the Spec
+### Step A2: Analyze the Spec
 
 From the spec, identify:
 
@@ -256,7 +277,7 @@ From the spec, identify:
 6. **Integrations**: External services to connect
 7. **Testing requirements**: Unit tests, integration tests, E2E tests
 
-### Step 3: Propose Task Breakdown
+### Step A3: Propose Task Breakdown
 
 Create a task list following this process:
 
@@ -267,7 +288,7 @@ Create a task list following this process:
 5. Include verification/testing tasks
 6. Review for proper ordering
 
-### Step 4: Get User Feedback
+### Step A4: Get User Feedback
 
 Present the proposed task list and ask:
 
@@ -276,9 +297,79 @@ Present the proposed task list and ask:
 - Did I miss any features from the spec?
 - Any tasks that should be combined or split?
 
-### Step 5: Refine and Output
+### Step A5: Refine and Output
 
 Incorporate feedback and generate the final `prd.json`.
+
+---
+
+## Workflow B: Incremental Task Management
+
+Use this workflow when adding tasks one at a time based on user requests.
+
+### Step B1: Understand the Request
+
+Listen to what the user wants to accomplish. They might say:
+
+- "Add a task to implement user authentication"
+- "Create a task for setting up the database"
+- "I need a task that adds dark mode support"
+
+### Step B2: Check Existing Context
+
+1. **Read existing `prd.json`** if it exists to understand:
+   - What tasks already exist (avoid duplicates or overlaps)
+   - The current state of the project (which tasks are passed)
+   - The style and granularity used in existing tasks
+
+2. **Briefly explore the codebase** if needed to understand:
+   - Tech stack and patterns in use
+   - Where the new feature should integrate
+   - Any relevant existing code to reference in notes
+
+### Step B3: Create the Task
+
+Based on the user's request, create a single well-formed task:
+
+1. Write a clear `description` that captures the end goal
+2. Break down into specific, actionable `subtasks`
+3. Include verification steps
+4. Add helpful `notes` with context, constraints, or references
+5. Set `passed` to `false`
+
+### Step B4: Present and Confirm
+
+Show the proposed task to the user:
+
+```json
+{
+  "description": "...",
+  "subtasks": [...],
+  "notes": "...",
+  "passed": false
+}
+```
+
+Ask if they want to:
+
+- Modify anything about the task
+- Add it to `prd.json`
+- Create additional related tasks
+
+### Step B5: Add to prd.json
+
+Once confirmed:
+
+- If `prd.json` exists, append the new task to the `tasks` array
+- If `prd.json` doesn't exist, create it with the new task
+- Consider placement: ask the user where it should go, or place it logically based on dependencies
+
+### Incremental Mode Tips
+
+- **Keep context between requests**: If the user is adding multiple tasks in a session, remember what was already added
+- **Suggest related tasks**: If you notice the user's task implies other work, offer to create those tasks too
+- **Respect user's pace**: Don't push for a complete PRD if the user wants to work incrementally
+- **Handle modifications**: If the user wants to edit an existing task, help them update it
 
 ## Output Format
 
@@ -372,7 +463,7 @@ Generate valid JSON following this schema:
 
 ## Validation Checklist
 
-Before finalizing the prd.json, verify:
+Before finalizing any task (whether single or full PRD), verify:
 
 - [ ] Every task can be completed in a single agent session
 - [ ] Subtasks are specific and actionable (not vague)
@@ -381,3 +472,18 @@ Before finalizing the prd.json, verify:
 - [ ] No overlapping scope between tasks
 - [ ] Notes provide helpful context where needed
 - [ ] The JSON is valid and follows the schema
+
+## Summary: Following User Intent
+
+**Always follow what the user prompts you to do:**
+
+| User Says                                                    | Action                               |
+| ------------------------------------------------------------ | ------------------------------------ |
+| "Create PRD", "Plan the project", "Break down the spec"      | Full PRD Creation (Workflow A)       |
+| "Add a task", "Create a task for X", "I need a task that..." | Incremental Task (Workflow B)        |
+| "Add these tasks: X, Y, Z"                                   | Multiple incremental tasks           |
+| "Update task X", "Modify the task for..."                    | Edit existing task in prd.json       |
+| "What tasks do I have?"                                      | Read and summarize prd.json          |
+| Unclear request                                              | Ask the user to clarify their intent |
+
+The key principle: **This skill helps you manage tasks for Ralph. Adapt to what the user needs rather than forcing a specific workflow.**
