@@ -29,7 +29,7 @@ Ralph is a shell-based approach to running AI coding agents in a continuous loop
 | `prd.json`    | Project task list with small, granular, actionable items                 |
 | `progress.md` | Running log that acts as "memory" between agent sessions                 |
 | `PROMPT.md`   | System prompt template that instructs the agent each iteration           |
-| `SPEC.md`     | Project specification document describing what you're building           |
+| `SPEC.md`     | High-level project spec — what you're building and why (stable, not implementation details) |
 | `start.sh`    | The orchestration script that runs the agent loop                        |
 | `skills/`     | Directory containing skill prompts for creating/iterating on Ralph files |
 
@@ -65,16 +65,17 @@ Ralph is a shell-based approach to running AI coding agents in a continuous loop
    Your project structure will look like:
 
    ```
-   my-project/
-   ├── src/              # Your project files
-   ├── package.json
-   └── ralph/            # Ralph configuration
-       ├── start.sh
-       ├── config
-       ├── PROMPT.md
-       ├── SPEC.md
-       ├── prd.json
-       └── progress.md
+    my-project/
+    ├── src/              # Your project files
+    ├── package.json
+    └── ralph/            # Ralph configuration
+        ├── start.sh
+        ├── config
+        ├── PROMPT.md
+        ├── SPEC.md
+        ├── prd.json
+        ├── progress.md
+        └── skills/       # Skill prompts for creating Ralph files
    ```
 
 2. Configure your agent CLI in `ralph/config` (optional - defaults to `opencode run`):
@@ -122,7 +123,7 @@ The task list that drives the agent's work. Tasks should be small and granular -
 
 ### SPEC.md
 
-The project specification document. This describes what you're building at a high level. The agent reads this to understand the overall goal and make informed decisions.
+The high-level project specification. Captures **what** you're building and **why** — goals, scope, tech stack choices, and architectural decisions. Implementation details (concrete tasks, exact thresholds, file-level structure) belong in `prd.json` and the codebase itself. A good spec is stable and rarely needs updating as the project evolves.
 
 ### PROMPT.md
 
@@ -179,27 +180,27 @@ Ralph is designed to be CLI-agnostic. The prompt is passed as the **last argumen
 
 The `skills/` directory contains specialized prompts to help you create and refine Ralph configuration files:
 
-### CREATE_SPEC.md
+### create-spec (`skills/create-spec/SKILL.md`)
 
-A comprehensive guide for creating or refining your `SPEC.md` file. This skill helps you:
+A guide for creating or refining your `SPEC.md` file. This skill helps you:
 
-- Define clear project overview and features
+- Define a clear project overview (what, why, who)
+- Scope high-level capabilities and explicit boundaries
 - Make explicit technical stack decisions
-- Document API design and data models
-- Set constraints and requirements
-- Define what's out of scope
+- Document architectural decisions (patterns, not file trees)
+- Set directional constraints (not implementation-level targets)
 
 **Usage**: Load this skill in your AI assistant when creating or iterating on your project specification.
 
-### CREATE_PRD.md
+### create-prd (`skills/create-prd/SKILL.md`)
 
-A detailed guide for breaking down your project into actionable tasks in `prd.json`. This skill helps you:
+A guide for breaking down your project into actionable tasks in `prd.json`. This skill helps you:
 
 - Create properly-sized tasks (completable in one agent session)
 - Write specific, actionable subtasks
-- Include verification steps for each task
+- Include verification + code quality checks (tests, type checking, linting)
 - Order tasks logically without explicit dependencies
-- Avoid common anti-patterns
+- Avoid overlapping scope between tasks
 
 **Usage**: Load this skill in your AI assistant when creating or refining your task list. Reference your `SPEC.md` for context.
 
@@ -207,11 +208,11 @@ A detailed guide for breaking down your project into actionable tasks in `prd.js
 
 1. **Keep tasks small**: Each task should be completable and actionable in a single agent session
 2. **Subtasks must be specific**: Break down the work into concrete steps (e.g., "Create POST /auth/login endpoint", "Add JWT token generation", "Write integration tests for login flow")
-3. **Include verification steps**: Add subtasks for testing and verification
+3. **Include verification + code quality checks**: End every task with test, type check (`npm run typecheck`), and lint/format (`npm run lint`) subtasks
 4. **Provide context**: Use the `notes` field to guide the agent with constraints or tips
 5. **Order logically**: While the agent infers dependencies, ordering tasks logically helps
 
-> **Tip**: Use the `CREATE_PRD.md` skill prompt with your AI assistant to get expert guidance on task breakdown.
+> **Tip**: Use the `create-prd` skill prompt with your AI assistant to get expert guidance on task breakdown.
 
 ## License
 
