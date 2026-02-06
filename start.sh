@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Ralph - AI Agent Orchestration Script
 # Runs an AI coding agent in a loop until all tasks are complete
