@@ -13,7 +13,7 @@
 # Examples:
 #   opencode run            (OpenCode: runs with message as argument)
 #   claude -p --dangerously-skip-permissions  (Claude Code CLI with auto-approve)
-RALPH_AGENT_CMD="${RALPH_AGENT_CMD:-claude -p --dangerously-skip-permissions}"
+RALPH_AGENT_CMD="${RALPH_AGENT_CMD:-opencode run}"
 
 # -----------------------------------------------------------------------------
 # Model Selection (OpenCode only)

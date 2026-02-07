@@ -10,7 +10,7 @@ Read these files to understand the current state:
 2. **`prd.json`** - Task list with all tasks and their status
 3. **`progress.md`** - Log of completed work and notes from previous iterations
 
-> **Note**: These files may be located in a `ralph/` subdirectory (e.g., `ralph/SPEC.md`, `ralph/prd.json`, `ralph/progress.md`). Check both locations.
+> **Note**: These files may be located in a `.ralph/` subdirectory (e.g., `.ralph/SPEC.md`, `.ralph/prd.json`, `.ralph/progress.md`). Check both locations.
 
 ## Step 2: Select a Task
 
