@@ -12,7 +12,6 @@
 # The prompt will be passed as the LAST argument to this command.
 # Examples:
 #   opencode run            (OpenCode: runs with message as argument)
-#   claude -p               (Claude Code CLI in print/pipe mode)
 #   claude -p --dangerously-skip-permissions  (Claude Code CLI with auto-approve)
 RALPH_AGENT_CMD="${RALPH_AGENT_CMD:-claude -p --dangerously-skip-permissions}"
 
@@ -27,7 +26,7 @@ RALPH_AGENT_CMD="${RALPH_AGENT_CMD:-claude -p --dangerously-skip-permissions}"
 #   google/gemini-2.5-pro
 #   ollama/qwen3:8b-16k
 # Run "opencode models" to see all available models.
-RALPH_MODEL="${RALPH_MODEL:-anthropic/claude-opus-4-5}"
+RALPH_MODEL="${RALPH_MODEL:-anthropic/claude-opus-4-6}"
 
 # -----------------------------------------------------------------------------
 # File Paths

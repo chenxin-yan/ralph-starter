@@ -24,14 +24,14 @@ Ralph is a shell-based approach to running AI coding agents in a continuous loop
 
 ### Core Components
 
-| File          | Description                                                              |
-| ------------- | ------------------------------------------------------------------------ |
-| `prd.json`    | Project task list with small, granular, actionable items                 |
-| `progress.md` | Running log that acts as "memory" between agent sessions                 |
-| `PROMPT.md`   | System prompt template that instructs the agent each iteration           |
+| File          | Description                                                                                 |
+| ------------- | ------------------------------------------------------------------------------------------- |
+| `prd.json`    | Project task list with small, granular, actionable items                                    |
+| `progress.md` | Running log that acts as "memory" between agent sessions                                    |
+| `PROMPT.md`   | System prompt template that instructs the agent each iteration                              |
 | `SPEC.md`     | High-level project spec — what you're building and why (stable, not implementation details) |
-| `start.sh`    | The orchestration script that runs the agent loop                        |
-| `skills/`     | Directory containing skill prompts for creating/iterating on Ralph files |
+| `start.sh`    | The orchestration script that runs the agent loop                                           |
+| `skills/`     | Directory containing skill prompts for creating/iterating on Ralph files                    |
 
 ### Workflow
 
@@ -54,57 +54,93 @@ Ralph is a shell-based approach to running AI coding agents in a continuous loop
 
 ### Setup
 
-1. Clone this starter into your project as a `ralph/` subdirectory:
+Run the install script from your project root:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/chenxin-yan/ralph-starter/main/install.sh | bash
+```
+
+This will:
+
+- Check prerequisites (`git`, `jq`, AI coding CLI)
+- Clone ralph-starter into a `.ralph/` subdirectory
+- Symlink skills to `.claude/skills/` for Claude Code CLI
+
+Your project structure will look like:
+
+```
+ my-project/
+ ├── src/              # Your project files
+ ├── package.json
+ ├── .claude/
+ │   └── skills/       # Symlinked Ralph skills for Claude Code
+ │       ├── create-spec/ -> .ralph/skills/create-spec/
+ │       └── create-prd/  -> .ralph/skills/create-prd/
+ └── .ralph/           # Ralph configuration
+     ├── start.sh
+     ├── config
+     ├── PROMPT.md
+     ├── SPEC.md
+     ├── prd.json
+     ├── progress.md
+     └── skills/       # Skill source files (single source of truth)
+```
+
+<details>
+<summary>Manual setup (without install script)</summary>
+
+```bash
+cd my-project
+git clone https://github.com/chenxin-yan/ralph-starter.git .ralph
+rm -rf .ralph/.git
+
+# Symlink skills to Claude Code
+mkdir -p .claude/skills/create-spec .claude/skills/create-prd
+ln -sf ../../../.ralph/skills/create-spec/SKILL.md .claude/skills/create-spec/SKILL.md
+ln -sf ../../../.ralph/skills/create-prd/SKILL.md .claude/skills/create-prd/SKILL.md
+```
+
+</details>
+
+Then:
+
+1. Configure your agent CLI in `.ralph/config` (optional — defaults to `opencode run`):
 
    ```bash
-   cd my-project
-   git clone https://github.com/chenxin-yan/ralph-starter.git ralph
-   rm -rf ralph/.git  # Remove Ralph's git history
+   # Edit .ralph/config and change RALPH_AGENT_CMD
+   RALPH_AGENT_CMD="claude -p --dangerously-skip-permissions"  # Example: use Claude CLI instead
    ```
 
-   Your project structure will look like:
+2. Write your project spec in `.ralph/SPEC.md`
 
-   ```
-    my-project/
-    ├── src/              # Your project files
-    ├── package.json
-    └── ralph/            # Ralph configuration
-        ├── start.sh
-        ├── config
-        ├── PROMPT.md
-        ├── SPEC.md
-        ├── prd.json
-        ├── progress.md
-        └── skills/       # Skill prompts for creating Ralph files
-   ```
+3. Create your task list in `.ralph/prd.json`
 
-2. Configure your agent CLI in `ralph/config` (optional - defaults to `opencode run`):
+4. Run Ralph from your project root:
 
    ```bash
-   # Edit ralph/config and change RALPH_AGENT_CMD
-   RALPH_AGENT_CMD="claude -p"  # Example: use Claude CLI instead
+   ./.ralph/start.sh
    ```
 
-3. Write your project spec in `ralph/SPEC.md`:
-
-4. Create your task list in `ralph/prd.json`:
-
-5. Run Ralph from your project root:
-
-   ```bash
-   ./ralph/start.sh
-   ```
-
-   The agent will run in your project root directory (where you invoke the script), while Ralph's config files are read from `./ralph/`.
+   The agent will run in your project root directory (where you invoke the script), while Ralph's config files are read from `./.ralph/`.
 
 ### Options
 
 ```bash
-./ralph/start.sh                    # Run until all tasks complete
-./ralph/start.sh --max-loops 10     # Limit to 10 iterations
-./ralph/start.sh --dry-run          # Show configuration without running
-./ralph/start.sh --help             # Show help message
+./.ralph/start.sh                    # Run until all tasks complete
+./.ralph/start.sh --max-loops 10     # Limit to 10 iterations
+./.ralph/start.sh --dry-run          # Show configuration without running
+./.ralph/start.sh --help             # Show help message
 ```
+
+### Updating
+
+To update Ralph to the latest version, run the install script with `--update`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/chenxin-yan/ralph-starter/main/install.sh | bash -s -- --update
+```
+
+This updates the framework files (`start.sh`, `PROMPT.md`, `skills/`) while preserving your project files (`config`, `SPEC.md`, `prd.json`, `progress.md`).
 
 ## File Formats
 
@@ -152,7 +188,7 @@ Ralph is configured via the `config` file, which is automatically sourced by `st
 | `RALPH_RATE_LIMIT_COOLDOWN` | Cooldown period in seconds          | `60`                                                 |
 | `RALPH_LOG_FILE`            | Log file path (empty to disable)    | `ralph.log`                                          |
 
-**Note**: File paths can be relative (resolved from `start.sh` directory) or absolute. This allows you to place all Ralph files in a subdirectory (e.g., `./ralph/`) while the agent runs from your project root.
+**Note**: File paths can be relative (resolved from `start.sh` directory) or absolute. This allows you to place all Ralph files in a subdirectory (e.g., `./.ralph/`) while the agent runs from your project root.
 
 ## Logging
 
