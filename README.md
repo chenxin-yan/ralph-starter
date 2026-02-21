@@ -2,48 +2,6 @@
 
 A methodology and automation toolkit for orchestrating long-running AI coding agents through iterative task execution. Inspired by [this video](https://www.youtube.com/watch?v=_IK18goX4X8) and other sources online.
 
-## Overview
-
-Ralph is a shell-based approach to running AI coding agents in a continuous loop, enabling them to work through complex, multi-task projects autonomously. Instead of managing a single long session that may hit context limits or rate limits, Ralph breaks work into small, granular tasks and maintains persistent context across agent sessions.
-
-## How It Works
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      ralph.sh Loop                          │
-│                                                             │
-│  ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐   │
-│  │  Read   │───▶│  Agent  │───▶│ Update  │───▶│  Commit │   │
-│  │ prd.json│    │  Works  │    │progress │    │ Changes │   │
-│  │         │    │ on Task │    │   .md   │    │         │   │
-│  └─────────┘    └─────────┘    └─────────┘    └─────────┘   │
-│       │                                             │       │
-│       └────────────── Next Iteration ◀──────────────┘       │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### Core Components
-
-| File          | Description                                                                                 |
-| ------------- | ------------------------------------------------------------------------------------------- |
-| `prd.json`    | Project task list with small, granular, actionable items                                    |
-| `progress.md` | Running log that acts as "memory" between agent sessions                                    |
-| `PROMPT.md`   | System prompt template that instructs the agent each iteration                              |
-| `SPEC.md`     | High-level project spec — what you're building and why (stable, not implementation details) |
-| `start.sh`    | The orchestration script that runs the agent loop                                           |
-| `skills/`     | Directory containing skill prompts for creating/iterating on Ralph files                    |
-
-### Workflow
-
-1. Agent reads `prd.json` and identifies the highest-priority task with no dependencies (agent infers priority and dependencies from context)
-2. Agent works on that single task, verifying implementation (tests, type checks, etc.)
-3. Agent updates `progress.md` with notes for future iterations
-4. Agent updates `prd.json` (marks task complete, update notes for other tasks)
-5. Agent commits changes
-6. Agent outputs completion signal
-7. Script detects completion, starts next iteration
-8. Loop continues until all tasks are complete (or max iterations reached)
-
 ## Quick Start
 
 ### Prerequisites
@@ -141,6 +99,44 @@ curl -fsSL https://raw.githubusercontent.com/chenxin-yan/ralph-starter/main/inst
 ```
 
 This updates the framework files (`start.sh`, `PROMPT.md`, `skills/`) while preserving your project files (`config`, `SPEC.md`, `prd.json`, `progress.md`).
+
+## How It Works
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      ralph.sh Loop                          │
+│                                                             │
+│  ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐   │
+│  │  Read   │───▶│  Agent  │───▶│ Update  │───▶│  Commit │   │
+│  │ prd.json│    │  Works  │    │progress │    │ Changes │   │
+│  │         │    │ on Task │    │   .md   │    │         │   │
+│  └─────────┘    └─────────┘    └─────────┘    └─────────┘   │
+│       │                                             │       │
+│       └────────────── Next Iteration ◀──────────────┘       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Core Components
+
+| File          | Description                                                                                 |
+| ------------- | ------------------------------------------------------------------------------------------- |
+| `prd.json`    | Project task list with small, granular, actionable items                                    |
+| `progress.md` | Running log that acts as "memory" between agent sessions                                    |
+| `PROMPT.md`   | System prompt template that instructs the agent each iteration                              |
+| `SPEC.md`     | High-level project spec — what you're building and why (stable, not implementation details) |
+| `start.sh`    | The orchestration script that runs the agent loop                                           |
+| `skills/`     | Directory containing skill prompts for creating/iterating on Ralph files                    |
+
+### Workflow
+
+1. Agent reads `prd.json` and identifies the highest-priority task with no dependencies (agent infers priority and dependencies from context)
+2. Agent works on that single task, verifying implementation (tests, type checks, etc.)
+3. Agent updates `progress.md` with notes for future iterations
+4. Agent updates `prd.json` (marks task complete, update notes for other tasks)
+5. Agent commits changes
+6. Agent outputs completion signal
+7. Script detects completion, starts next iteration
+8. Loop continues until all tasks are complete (or max iterations reached)
 
 ## File Formats
 
